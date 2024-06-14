@@ -131,7 +131,7 @@ class Solution:
         for pos in f:
             removed = self.overlaps[pos]
 
-            self.nums = [(num, ps - removed) for (num, ps) in self.nums]
+            self.nums = sorted([(num, ps - removed) for (num, ps) in self.nums], key=self.heur)
 
             if r := self._solve(
                 i + 1,
@@ -188,7 +188,7 @@ class Solution:
 
 
 size = 40
-cells = shikaku_from_json("./master.json", size)
+cells = shikaku_from_json("./hard_master.json", size)
 # cells = fetch.today('expert')
 grid = [list(x) for x in batched(cells, size)]
 
