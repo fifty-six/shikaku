@@ -12,6 +12,7 @@ from printer import pprint
 
 Possibility = tuple[int, int, int, int]
 Coord = tuple[int, int]
+Num = int
 
 
 def valid_sizes(X):
@@ -62,7 +63,7 @@ class Solution:
                     d = int(grid[x][y])
                     nums.append((x, y, d, fac[d]))
 
-        self.possibilities: defaultdict[Coord, set[tuple[int, Possibility]]] = (
+        self.possibilities: defaultdict[Coord, set[tuple[Num, Possibility]]] = (
             defaultdict(set)
         )
         self.cover: defaultdict[Coord, set[Possibility]] = defaultdict(set)
@@ -76,12 +77,24 @@ class Solution:
 
         self.nums = sorted(
             processed,
-            key=lambda x: (x[0] + 100000 * int(len(x[1]) == 1), -len(x[1])),
-            reverse=True,
+            key=self.heur
         )
 
+    @staticmethod
+    def heur(p: tuple[Num, set[Possibility]]):
+        num, possibilities = p
+
+        area_score = num
+
+        # cheat if it's only one possible
+        if len(possibilities) == 1:
+            area_score = 100000
+
+        # Sort by bigger area first, then those with less possibilities.
+        return (area_score, -len(possibilities))
+
     def solve(self):
-        return self._solve(0, set())
+        return self._solve(0)#, set())
 
     def solve_and_print(self):
         if r := self.solve():
@@ -107,21 +120,26 @@ class Solution:
 
         return True
 
-    def _solve(self, i, impossible):
-        if i == len(self.nums):
+    def _solve(self, i):
+        if len(self.nums) == 0:
             return grid
 
-        n, f = self.nums[i]
+        n, f = self.nums.pop()
 
-        for pos in f - impossible:
+        old = self.nums
+
+        for pos in f:
             removed = self.overlaps[pos]
+
+            self.nums = [(num, ps - removed) for (num, ps) in self.nums]
 
             if r := self._solve(
                 i + 1,
-                impossible | removed,
             ):
                 return fill(r, pos, COLORS[i % len(COLORS)])
 
+            self.nums = old
+        
         return None
 
     def add_cover(self, pos: Possibility, num: int):
