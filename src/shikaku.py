@@ -88,7 +88,7 @@ class Solution:
         area_score = num
 
         # cheat if it's only one possible
-        if len(possibilities) == 1:
+        if len(possibilities) <= 1:
             area_score = 100000
 
         # Sort by bigger area first, then those with less possibilities.
