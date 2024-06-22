@@ -9,6 +9,7 @@ import pprint as pp
 from parse import shikaku_from_json
 import fetch
 from printer import pprint
+from sys import argv
 
 Possibility = tuple[int, int, int, int]
 Coord = tuple[int, int]
@@ -186,9 +187,12 @@ class Solution:
 
         return invalidates
 
+if len(argv) != 2:
+    print(f"Usage: {argv[0]} [FILE]")
+    exit(-1)
 
 size = 40
-cells = shikaku_from_json("./hard_master.json", size)
+cells = shikaku_from_json(argv[1], size)
 # cells = fetch.today('expert')
 grid = [list(x) for x in batched(cells, size)]
 
